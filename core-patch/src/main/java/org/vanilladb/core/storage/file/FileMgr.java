@@ -304,6 +304,7 @@ public class FileMgr {
 
 				// Delete the file
 				boolean hasDeleted = new File(dbDirectory, fileName).delete();
+				// logger.info("delete:"+fileName);
 				if (!hasDeleted && logger.isLoggable(Level.WARNING))
 					logger.warning("cannot delete file: " + fileName);
 			}
