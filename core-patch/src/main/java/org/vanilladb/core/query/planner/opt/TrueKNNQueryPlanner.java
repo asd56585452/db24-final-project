@@ -36,7 +36,7 @@ public class TrueKNNQueryPlanner implements QueryPlanner {
 			if (viewdef != null)
 				views.add(VanillaDb.newPlanner().createQueryPlan(viewdef, tx));
 			else {
-				TablePlanner tp = new TablePlanner(tbl, data.pred(), data.embeddingFields(), tx, id);
+				TablePlanner tp = new TablePlanner(tbl, data.pred(), data.embeddingFields(), tx, id, data.limit());
 				tablePlanners.add(tp);
 			}
 			id += 1;

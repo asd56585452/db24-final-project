@@ -16,6 +16,8 @@
 package org.vanilladb.core.storage.record;
 
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Logger;
+
 import org.vanilladb.core.server.VanillaDb;
 import org.vanilladb.core.sql.Constant;
 import org.vanilladb.core.sql.Record;
@@ -24,6 +26,7 @@ import org.vanilladb.core.sql.Type;
 import org.vanilladb.core.storage.buffer.Buffer;
 import org.vanilladb.core.storage.file.BlockId;
 import org.vanilladb.core.storage.file.Page;
+import org.vanilladb.core.storage.index.ivfflat.IvfflatIndex;
 import org.vanilladb.core.storage.metadata.TableInfo;
 import org.vanilladb.core.storage.tx.Transaction;
 
@@ -42,6 +45,7 @@ import org.vanilladb.core.storage.tx.Transaction;
  * </p>
  */
 public class RecordFile implements Record {
+	private static Logger logger = Logger.getLogger(RecordFile.class.getName());
 	private BlockId headerBlk;
 	private TableInfo ti;
 	private Transaction tx;
@@ -109,6 +113,7 @@ public class RecordFile implements Record {
 	 */
 	public void remove() {
 		close();
+		logger.info("remove:"+fileName);
 		VanillaDb.fileMgr().delete(fileName);
 	}
 
@@ -223,6 +228,7 @@ public class RecordFile implements Record {
 	 * then a new block is appended to the file.
 	 */
 	public void insert() {
+		// logger.info(fileName+":insert");
 		// Block read-only transaction
 		if (tx.isReadOnly() && !isTempTable())
 			throw new UnsupportedOperationException();
@@ -239,7 +245,8 @@ public class RecordFile implements Record {
 		
 		try {
 			// Log that this logical operation starts
-			tx.recoveryMgr().logLogicalStart();
+			if(this.doLog)
+				tx.recoveryMgr().logLogicalStart();
 	
 			if (fhp.hasDeletedSlots()) {
 				// Insert into a deleted slot
@@ -270,7 +277,8 @@ public class RecordFile implements Record {
 	
 			// Log that this logical operation ends
 			RecordId insertedRid = currentRecordId();
-			tx.recoveryMgr().logRecordFileInsertionEnd(ti.tableName(), insertedRid.block().number(), insertedRid.id());
+			if(this.doLog)
+				tx.recoveryMgr().logRecordFileInsertionEnd(ti.tableName(), insertedRid.block().number(), insertedRid.id());
 		} finally {
 			// Close the header (release the header latch)
 			closeHeader();
@@ -299,7 +307,8 @@ public class RecordFile implements Record {
 
 		try {
 			// Log that this logical operation starts
-			tx.recoveryMgr().logLogicalStart();
+			if(this.doLog)
+				tx.recoveryMgr().logLogicalStart();
 	
 			// Mark the specified slot as in used
 			moveToRecordId(rid);
@@ -330,7 +339,8 @@ public class RecordFile implements Record {
 			}
 	
 			// Log that this logical operation ends
-			tx.recoveryMgr().logRecordFileInsertionEnd(ti.tableName(), rid.block().number(), rid.id());
+			if(this.doLog)
+				tx.recoveryMgr().logRecordFileInsertionEnd(ti.tableName(), rid.block().number(), rid.id());
 		} finally {
 			// Close the header (release the header latch)
 			closeHeader();

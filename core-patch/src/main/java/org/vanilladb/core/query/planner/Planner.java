@@ -15,8 +15,15 @@
  *******************************************************************************/
 package org.vanilladb.core.query.planner;
 
+import java.util.List;
+
 import org.vanilladb.core.query.algebra.Plan;
 import org.vanilladb.core.query.parse.*;
+import org.vanilladb.core.server.VanillaDb;
+import org.vanilladb.core.storage.index.Index;
+import org.vanilladb.core.storage.index.ivfflat.IvfflatIndex;
+import org.vanilladb.core.storage.metadata.TableInfo;
+import org.vanilladb.core.storage.metadata.index.IndexInfo;
 import org.vanilladb.core.storage.tx.Transaction;
 
 /**
@@ -100,5 +107,23 @@ public class Planner {
 		if (tx.isReadOnly())
 			throw new UnsupportedOperationException();
 		return uPlanner.executeInsert(cmd, tx);
+	}
+
+	public int executeTrainIndex(String TableName,List<String> IdxFields,String IdxName,Transaction tx) {
+		IndexInfo aii=null;
+		for(int i=0;i<IdxFields.size();i++)
+		{
+			List<IndexInfo> iis = VanillaDb.catalogMgr().getIndexInfo(TableName, IdxFields.get(i), tx);
+			for(int i2=0;i2<iis.size();i2++)
+			{
+				IndexInfo ii = iis.get(i2);
+				if(ii.indexName().equals(IdxName))
+					aii=ii;
+			}
+		}
+		IvfflatIndex idx = (IvfflatIndex)aii.open(tx);
+		idx.TrainIndex();
+
+		return 1;
 	}
 }
