@@ -2,18 +2,15 @@ package org.vanilladb.bench.server.procedure.sift;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.vanilladb.bench.server.param.sift.SiftBenchParamHelper;
 import org.vanilladb.bench.server.procedure.StoredProcedureUtils;
 import org.vanilladb.core.query.algebra.Scan;
-import org.vanilladb.core.server.VanillaDb;
 import org.vanilladb.core.sql.VectorConstant;
 import org.vanilladb.core.sql.storedprocedure.StoredProcedure;
 import org.vanilladb.core.storage.tx.Transaction;
 
 public class SiftBenchProc extends StoredProcedure<SiftBenchParamHelper> {
-    private static Logger logger = Logger.getLogger(SiftBenchProc.class.getName());
 
     public SiftBenchProc() {
         super(new SiftBenchParamHelper());
@@ -37,12 +34,9 @@ public class SiftBenchProc extends StoredProcedure<SiftBenchParamHelper> {
 
         int count = 0;
         while (nearestNeighborScan.next()) {
-            Integer a = (Integer) nearestNeighborScan.getVal("i_id").asJavaVal();
-            nearestNeighbors.add(a);
+            nearestNeighbors.add((Integer) nearestNeighborScan.getVal("i_id").asJavaVal());
             count++;
         }
-        // logger.info("SiftBenchProc size:"+nearestNeighbors.size());
-        // logger.info("SiftBenchProc count:"+count);
 
         nearestNeighborScan.close();
 

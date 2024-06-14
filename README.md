@@ -20,7 +20,7 @@ Can you extend a relational database system to support storing and querying over
 5. Run the provided SIFT benchmark
 6. Check the benchmark result
 
-Note: Your improvement will be evaluated on the provided properties (10k items with 48-dimensional vector embedding each), same machine, same time limit(30 minutes for loadtestbed+benchmark).
+Note: Your improvement will be evaluated on the provided properties (1M items with 128-dimensional vector embedding each), same machine, same time limit(30 minutes for Loadtestbed+Benchmark excluding Recall Calculation).
 
 ## Note
 The new workload includes `insert`. Please be sure to reload the testbed each time you run a benchmark.
