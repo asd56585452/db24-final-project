@@ -359,7 +359,7 @@ public class IvfflatIndex extends Index {
 	public void TrainIndex() {
 		long st=java.lang.System.currentTimeMillis();
 		long endt=1000*60*27;
-		float sample_rate=0.5f;
+		float sample_rate=0.25f;
 		int drop_index_minnum=50;
 		hasLoad=true;
 		close();
